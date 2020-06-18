@@ -1,0 +1,30 @@
+import React, { useContext } from "react";
+
+import { PipesContext } from "./AddPipeF";
+
+export default function TotalPipeF(props) {
+
+    return (
+        <div className="container">
+            <div className="card border-success mb-4">
+                <table className="table table-striped table-dark mb-0">
+                    <thead>
+                        <tr>
+                            <th scope="row">Name</th>
+                            <th scope="col">Total / Pipe</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {props &&
+                            props.TotalPipeFy.map(total => (
+                                <tr key={total.id}>
+                                    <th scope="row">{total.name}</th>
+                                    <td>{total.quantity}</td>
+                                </tr>
+                            ))}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    );
+}
