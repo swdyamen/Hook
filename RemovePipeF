@@ -1,0 +1,182 @@
+import axios from "axios";
+import React, {
+    useState,
+    useEffect,
+    createContext,
+  
+} from "react";
+import PipeRF from "./PipeRF";
+import TotalPipeRF from "./TotalPipeRF";
+
+export const PipesContext = createContext();
+
+export default function RemovePipeF() {
+    const [name, setname] = useState("");
+    const [quantity, setquantity] = useState("");
+    const [ordern, setordern] = useState("");
+    const [TotalPipeFy, setTotalPipeFy] = useState([]);
+    const [pipeFy, setPipeFy] = useState([]);
+    const [pipes, setPipes] = useState([]);
+
+    const [pageno, setPageno] = useState(1);
+
+    const [lastPage, setLastPage] = useState(0);
+
+    const pageCurrent = e => setPageno(e.target.firstChild.data);
+
+    const nextPage = () => {
+        console.log(pageno);
+        if (+pageno + 1 <= lastPage) {
+            const npageno = +pageno + 1;
+            setPageno(npageno);
+            console.log(pageno);
+        }
+    };
+
+    const previousPage = () => {
+        if (pageno >= 1) {
+            setPageno(pageno - 1);
+            console.log(pageno);
+        }
+    };
+
+    const onRemoveButton = e => {
+        e.preventDefault();
+        console.log("onSubmitButton");
+
+        axios
+            .post("/api/removepipe/removepipe", {
+                name,
+
+                quantity,
+
+                ordern
+            })
+
+            .then(function(response) {
+                console.log(response.data);
+            })
+
+            .catch(function(error) {
+                console.log(error);
+            });
+        setPageno(1);
+        setname(""), setquantity(""), setordern("");
+    };
+
+    useEffect(() => {
+        async function result() {
+            const response = await axios
+                .get("/api/pipe/totalpipe")
+                .then(response => {
+                    setTotalPipeFy(response.data);
+                });
+        }
+
+        result();
+    }, []);
+
+    useEffect(() => {
+        async function result() {
+            const response = await axios
+                .get("/api/pipe/totalpipe")
+                .then(response => {
+                    setTotalPipeFy(response.data);
+                });
+        }
+
+        result();
+    }, [TotalPipeFy]);
+
+    useEffect(() => {
+        async function result() {
+            const response = await axios
+                .get("/api/removepipe/list?page=" + pageno)
+                .then(response => {
+                    setPipes(response.data.data),
+                        setLastPage(response.data.last_page);
+                    setPipeFy(response.data.data);
+                });
+        }
+
+        result();
+    }, [pipes]);
+
+    useEffect(() => {
+        //console.log(pageno);
+        async function result() {
+            const response = await axios
+                .get("/api/removepipe/list?page=" + pageno)
+                .then(response => {
+                    setPipes(response.data.data),
+                        setLastPage(response.data.last_page);
+                    //console.log(pageno);
+                });
+        }
+        // console.log("Pipes: ", pipes);
+        //console.log("Props: ", props.pipes);
+        result();
+    }, [pageno]);
+
+    return (
+        <div className="container">
+            <div className="card border-success mb-5">
+                <div className="card-header">Remove Pipe</div>
+                <div className="card-body text-success">
+                    <form onSubmit={onRemoveButton}>
+                        <div className="row">
+                            <div className="col-md-3">
+                                <select
+                                    className="form-control"
+                                    id="exampleFormControlSelect1"
+                                    name="name"
+                                    onChange={e => setname(e.target.value)}
+                                    value={name}
+                                >
+                                    <option>Choose...</option>
+                                    <option>J:SON</option>
+                                    <option>PipeLife</option>
+                                </select>
+                            </div>
+                            <div className="col-md-3">
+                                <input
+                                    className="form-control"
+                                    placeholder="Quantity / Pipe"
+                                    type="text"
+                                    name="quantity"
+                                    value={quantity}
+                                    onChange={e => setquantity(e.target.value)}
+                                />
+                            </div>
+                            <div className="col-md-4">
+                                <input
+                                    className="form-control"
+                                    placeholder="Order No."
+                                    type="text"
+                                    name="ordern"
+                                    value={ordern}
+                                    onChange={e => setordern(e.target.value)}
+                                />
+                            </div>
+
+                            <button className="btn btn-danger">Remove</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <PipesContext.Provider
+                value={{
+                    pipes,
+                    lastPage,
+                    pageno,
+                    pageCurrent,
+                    nextPage,
+                    previousPage
+                }}
+            >
+                <TotalPipeRF TotalPipeFy={TotalPipeFy} />
+                <PipeRF />
+            </PipesContext.Provider>
+        </div>
+    );
+}
