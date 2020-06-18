@@ -1,0 +1,88 @@
+import React, { useState, useEffect, useContext } from "react";
+import { PipesContext } from "./AddPipeF";
+
+export default function PipeF({ PipeFy, addpipes }) {
+    const { lastPage } = useContext(PipesContext);
+    const { pipes } = useContext(PipesContext);
+    const { pageCurrent } = useContext(PipesContext);
+    const { nextPage } = useContext(PipesContext);
+    const { previousPage } = useContext(PipesContext);
+    const { isLoading } = useContext(PipesContext);
+
+    return (
+        <div className="container">
+            <div className="card border-success mb-4">
+                <table className="table table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">For</th>
+                            <th scope="col">Kolliantal/BNT</th>
+                            <th scope="col">Order No.</th>
+                            <th scope="col">Date</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {pipes &&
+                            pipes.map(pipe => (
+                                <tr key={pipe.id}>
+                                    <th scope="row">{pipe.id}</th>
+                                    <td>{pipe.name}</td>
+
+                                    <td>{pipe.quantity}</td>
+                                    <td>{pipe.ordern}</td>
+                                    <td>
+                                        {new Intl.DateTimeFormat("en-GB", {
+                                            day: "2-digit",
+                                            month: "2-digit",
+                                            year: "numeric"
+                                        }).format(new Date(pipe.created_at))}
+                                    </td>
+                                </tr>
+                            ))}
+                    </tbody>
+                </table>
+
+                {lastPage > 0 && (
+                    <nav aria-label="Page navigation example">
+                        <ul className="pagination justify-content-end">
+                            <li className="page-item">
+                                <a
+                                    className="page-link"
+                                    onClick={previousPage}
+                                    aria-label="Previous"
+                                >
+                                    <span aria-hidden="true">&laquo;</span>
+                                    <span className="sr-only">Previous</span>
+                                </a>
+                            </li>
+
+                            {_.times(lastPage, i => (
+                                <li key={i} className="page-item">
+                                    <a
+                                        className="page-link"
+                                        onClick={pageCurrent}
+                                    >
+                                        {i + 1}
+                                    </a>
+                                </li>
+                            ))}
+
+                            <li className="page-item">
+                                <a
+                                    className="page-link"
+                                    onClick={nextPage}
+                                    aria-label="Next"
+                                >
+                                    <span aria-hidden="true">&raquo;</span>
+                                    <span className="sr-only">Next</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                )}
+            </div>
+        </div>
+    );
+}
